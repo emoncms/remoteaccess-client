@@ -247,7 +247,7 @@ def call_api(msg):
     
     # data['q'] = '' # overwrite modrewrite's "q" parameter
     # only allow these endpoints
-    whitelist = ['feed/list', 'feed/data']
+    whitelist = ['app/list','feed/list', 'feed/data', 'feed/value', 'feed/timevalue', 'feed/listwithmeta', 'feed/fetch']
     if not data['action'] in whitelist:
         logging.error('action %s not found in whitelist' % data['action'])
         return
