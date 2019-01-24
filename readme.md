@@ -49,3 +49,8 @@ Install and start remoteaccess service:
 View service log:
 
     journalctl -f -u remoteaccess -n 100
+
+
+## Install Client Emoncms Module
+
+    ln -s /home/pi/remoteaccess-client/remoteaccess /var/www/emoncms/Modules/remoteaccess
