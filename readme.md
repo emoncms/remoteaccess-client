@@ -14,6 +14,8 @@ https://mqtt.emoncms.org
 
 Create remoteaccess.env settings file with emoncms.org username and password.
 
+    git clone https://github.com/emoncms/remoteaccess-client
+    cd remoteaccess-client
     cp remoteaccess.env.example .env
     nano remoteaccess.env
 
