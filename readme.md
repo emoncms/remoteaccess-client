@@ -14,9 +14,10 @@ https://mqtt.emoncms.org
 
 Create remoteaccess.env settings file with emoncms.org username and password.
 
+    cd ~/ 
     git clone https://github.com/emoncms/remoteaccess-client
     cd remoteaccess-client
-    cp remoteaccess.env.example .env
+    cp remoteaccess.env.example remoteaccess.env
     nano remoteaccess.env
 
 Enter your local emoncms apikey and remote emoncms.org account username and password to connect:
