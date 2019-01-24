@@ -6,7 +6,7 @@
 
 # INSTALL:
 
-# sudo ln -s /home/pi/remoteaccess/remoteaccess.service /lib/systemd/system
+# sudo ln -s /home/pi/remoteaccess-client/remoteaccess.service /lib/systemd/system
 
 # RUN AT STARTUP
 # sudo systemctl daemon-reload
@@ -38,10 +38,10 @@
 ###
 
 [Unit]
-Description=Emoncms MQTT Input Script
+Description=Emoncms RemoteAccess script
 Wants=mosquitto.service mysql.service redis.service
 After=mosquitto.service mysql.service redis.service
-Documentation=https://github.com/emoncms/remoteaccess.git
+Documentation=https://github.com/emoncms/remoteaccess-client.git
 
 # Uncomment this line to use a dedicated log file for StdOut and StdErr.
 # NOTE: only works in systemd v236+
@@ -50,7 +50,7 @@ Documentation=https://github.com/emoncms/remoteaccess.git
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/php /home/pi/remoteaccess/run.php
+ExecStart=/usr/bin/python /home/pi/remoteaccess-client/client.py
 User=pi
 
 # Restart script if stopped
@@ -65,3 +65,4 @@ SyslogIdentifier=remoteaccess
 
 [Install]
 WantedBy=multi-user.target
+

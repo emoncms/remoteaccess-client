@@ -11,7 +11,8 @@ import urllib
 from os import path, getenv
 from dotenv import load_dotenv
 
-_dir = path.dirname(path.dirname(path.abspath(__file__)))
+_dir = path.dirname(path.abspath(__file__))
+
 # Load file from the path.
 dotenv_path = path.join(_dir, 'remoteaccess.env.dev')
 if path.isfile(dotenv_path) is False:
