@@ -20,7 +20,7 @@ Create remoteaccess.env settings file with emoncms.org username and password.
     cp remoteaccess.env.example remoteaccess.env
     nano remoteaccess.env
 
-Enter your local emoncms apikey and remote emoncms.org account username and password to connect:
+Enter your **Local Emoncms** apikey and MQTT username / password is your **Remote Emoncms.org** account username and password to connect:
 
     # application mode
     APP_ENV='production'
