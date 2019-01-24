@@ -1,0 +1,16 @@
+# Python Standard Library
+#   json
+#   logging
+#   sys
+#   time  
+#   ssl
+#   os
+#   urllib
+
+# Additional Required Packages
+requests==2.21.0
+paho-mqtt==1.4.0
+python-dotenv==0.9.1
+
+# install the above packaes with pip:-
+# $ pip install -r requirements.txt
