@@ -37,7 +37,7 @@
         <br>
         <button id="connect" class="btn">Connect</button>
         <br><br>
-        <label>Current emonhub.conf apikey:</label>
+        <label>Remote apikey:</label>
         <input type="text" id="apikey" style="width:400px" readonly>
     </div>
 
