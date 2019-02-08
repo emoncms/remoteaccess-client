@@ -248,12 +248,29 @@ def call_api(msg):
     
     # data['q'] = '' # overwrite modrewrite's "q" parameter
     # only allow these endpoints
-    whitelist = ['app/list','feed/list', 'feed/data', 'feed/value', 'feed/timevalue', 'feed/listwithmeta', 'feed/fetch']
-    if not data['action'] in whitelist:
+    action = request['controller'] + "/" + request['action']
+    whitelist = ['app/list','feed/list', 'feed/data', 'feed/value', 'feed/timevalue', 'feed/listwithmeta', 'feed/fetch', 'device/list','demandshaper/get','demandshaper/submit','input/get']
+    if not action in whitelist:
         logging.error('action %s not found in whitelist' % data['action'])
         return
 
-    path = "/emoncms/" + data["action"]
+    # Build path
+    path = "/emoncms"
+    if 'controller' in request:
+        path += "/"+request['controller']
+    if 'action' in request:
+        path += "/"+request['action']
+    if 'subaction' in request:
+        path += "/"+request['subaction']
+    
+    # Query param and apikey are not allowed    
+    if 'q' in request["data"]:
+        logging.error('param q not allowed')
+        return
+    if 'apikey' in request["data"]:
+        logging.error('apikey not allowed')
+        return
+        
     if 'data' in request:
         params = merge_two_dicts(data["parameters"], request["data"])
     else:
