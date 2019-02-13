@@ -7,6 +7,8 @@ function remoteaccess_controller() {
 
     global $session, $route, $homedir, $user;
     
+    $config_file = $homedir."/remoteaccess-client/remoteaccess.json";
+    
     // Default route format
     $route->format = 'json';
     
@@ -22,7 +24,14 @@ function remoteaccess_controller() {
     if ($session['write']) {
         if ($route->action == "view") {
             $route->format = 'html';
-            return view("Modules/remoteaccess/remoteaccess_view.php", array());
+            
+            $config = new stdClass();
+            if (file_exists($config_file)) {
+                $config = json_decode(file_get_contents($config_file));
+            } else {
+                $config = json_decode(file_get_contents("$config_file.example"));
+            }
+            return view("Modules/remoteaccess/remoteaccess_view.php", array("config"=>$config));
         }
         
     
@@ -38,14 +47,19 @@ function remoteaccess_controller() {
             )));
             
             if (isset($result->success) && $result->success) {
-                $config = json_decode(file_get_contents($homedir."/remoteaccess-client/remoteaccess.json"));
+                $config = new stdClass();
+                if (file_exists($config_file)) {
+                    $config = json_decode(file_get_contents($config_file));
+                } else {
+                    $config = json_decode(file_get_contents("$config_file.example"));
+                }
             
                 if ($config!=null) {
                     $u = $user->get($session["userid"]);
-                    $config["EMONCMS_APIKEY"] = $u->apikey_read;
-                    $config["MQTT_HOST"] = $host;
-                    $config["MQTT_USERNAME"] = $username;
-                    $config["MQTT_PASSWORD"] = $password;
+                    $config->EMONCMS_APIKEY = $u->apikey_read;
+                    $config->MQTT_HOST = $host;
+                    $config->MQTT_USERNAME = $username;
+                    $config->MQTT_PASSWORD = $password;
                     $fh = fopen($homedir."/remoteaccess-client/remoteaccess.json","w");
                     fwrite($fh,json_encode($config, JSON_PRETTY_PRINT));
                     fclose($fh);

@@ -33,7 +33,7 @@
         <input type="text" id="username">
         
         <label>Password:</label>
-        <input type="text" id="password">
+        <input type="password" id="password">
         <br>
         <button id="connect" class="btn">Connect</button>
         <br><br>
@@ -51,6 +51,11 @@
 <script>
 init_sidebar({menu_element:"#remoteaccess_menu"});
 var path = "<?php echo $path; ?>";
+var config = <?php echo json_encode($config); ?>;
+
+$("#host").val(config.MQTT_HOST);
+$("#username").val(config.MQTT_USERNAME);
+$("#password").val(config.MQTT_PASSWORD);
 
 $("#connect").click(function() {
     var host = $("#host").val();
