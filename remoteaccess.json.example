@@ -1,0 +1,25 @@
+{
+  "APP_ENV":"production",
+  "EMONCMS_APIKEY":"",
+  "MQTT_HOST":"mqtt.emoncms.org",
+  "MQTT_USERNAME":"",
+  "MQTT_PASSWORD":"",
+  "MQTT_PORT":8883,
+  "MQTT_TLS":true,
+  "MQTT_TRANSPORT":"tcp",
+  
+  "ACCESS_CONTROL":[
+    "app/list",
+    "feed/list",
+    "feed/data",
+    "feed/value",
+    "feed/timevalue",
+    "feed/listwithmeta",
+    "feed/fetch",
+    "device/list",
+    "demandshaper/get",
+    "demandshaper/submit",
+    "input/get"
+  ]
+}
+  

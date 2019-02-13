@@ -13,9 +13,6 @@ function remoteaccess_controller() {
     // Result can be passed back at the end or part way in the controller
     $result = false;
     
-    require "Modules/remoteaccess/remoteaccess_model.php";
-    $remoteaccess = new RemoteAccess();
-    
     // Read access API's and pages
     if ($session['read']) {
     
@@ -41,14 +38,17 @@ function remoteaccess_controller() {
             )));
             
             if (isset($result->success) && $result->success) {
-                $env = $remoteaccess->load_env($homedir."/remoteaccess-client/remoteaccess.env");
-                if ($env) {
+                $config = json_decode(file_get_contents($homedir."/remoteaccess-client/remoteaccess.json"));
+            
+                if ($config!=null) {
                     $u = $user->get($session["userid"]);
-                    $env["EMONCMS_APIKEY"] = $u->apikey_read;
-                    $env["MQTT_HOST"] = $host;
-                    $env["MQTT_USERNAME"] = $username;
-                    $env["MQTT_PASSWORD"] = $password;
-                    $remoteaccess->save_env($homedir."/remoteaccess-client/remoteaccess.env",$env);
+                    $config["EMONCMS_APIKEY"] = $u->apikey_read;
+                    $config["MQTT_HOST"] = $host;
+                    $config["MQTT_USERNAME"] = $username;
+                    $config["MQTT_PASSWORD"] = $password;
+                    $fh = fopen($homedir."/remoteaccess-client/remoteaccess.json","w");
+                    fwrite($fh,json_encode($config, JSON_PRETTY_PRINT));
+                    fclose($fh);
                 }
             }
             return $result;

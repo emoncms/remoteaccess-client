@@ -9,34 +9,31 @@ import paho.mqtt.client as paho
 import os
 import urllib
 from os import path, getenv
-from dotenv import load_dotenv
 
 _dir = path.dirname(path.abspath(__file__))
 
 # Load file from the path.
-dotenv_path = path.join(_dir, 'remoteaccess.env.dev')
-if path.isfile(dotenv_path) is False:
-    # Load local dev version if exists
-    dotenv_path = path.join(_dir, 'remoteaccess.env')
-
-if path.isfile(dotenv_path) is False:
-    logging.error('.env file not found')
+config_path = path.join(_dir, 'remoteaccess.json')
+if path.isfile(config_path) is False:
+    logging.error('config file not found')
     sys.exit(0)
 else:
-    load_dotenv(dotenv_path)
+    with open('remoteaccess.json') as config_file:  
+        config = json.load(config_file)
 
 #-----------------------------------------------------------
 #-      SETTINGS
 #-----------------------------------------------------------
 
-host = getenv('MQTT_HOST')
-username = getenv('MQTT_USERNAME')
-password = getenv('MQTT_PASSWORD')
-apikey = getenv('EMONCMS_APIKEY')
-port = int(getenv('MQTT_PORT'))
-tls = getenv('MQTT_TLS').lower() == 'true'
-mode = getenv('APP_ENV')
-mqtt_transport = getenv('MQTT_TRANSPORT')
+host = config['MQTT_HOST']
+username = config['MQTT_USERNAME']
+password = config['MQTT_PASSWORD']
+apikey = config['EMONCMS_APIKEY']
+port = int(config['MQTT_PORT'])
+tls = config['MQTT_TLS']
+mode = config['APP_ENV']
+mqtt_transport = config['MQTT_TRANSPORT']
+access_control = config['ACCESS_CONTROL']
 
 if mode == 'production':
     logging_level = logging.ERROR
@@ -249,8 +246,8 @@ def call_api(msg):
     # data['q'] = '' # overwrite modrewrite's "q" parameter
     # only allow these endpoints
     action = request['controller'] + "/" + request['action']
-    whitelist = ['app/list','feed/list', 'feed/data', 'feed/value', 'feed/timevalue', 'feed/listwithmeta', 'feed/fetch', 'device/list','demandshaper/get','demandshaper/submit','input/get']
-    if not action in whitelist:
+
+    if not action in access_control:
         logging.error('action %s not found in whitelist' % data['action'])
         return
 
