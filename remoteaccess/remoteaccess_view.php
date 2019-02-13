@@ -21,11 +21,11 @@
 
   <div style="padding:20px">
 
-    <h2>Emoncms RemoteAccess</h2>
+    <h2>Emoncms Remote Access</h2>
     <p>Access your local emoncms installation remotely</p>
     
     <div style="background-color:#eee; padding:20px; max-width:600px">
-        <p style="color:#666">Enter username and password to fetch remote account apikey.</p>
+        <p style="color:#666">Enter host, username and password of remote account</p>
         <label>Host (default: mqtt.emoncms.org):</label>
         <input type="text" id="host" value="emoncms.org">
         
@@ -35,10 +35,10 @@
         <label>Password:</label>
         <input type="password" id="password">
         <br>
-        <button id="connect" class="btn">Connect</button>
-        <br><br>
-        <label>Remote apikey:</label>
-        <input type="text" id="apikey" style="width:400px" readonly>
+        <button id="connect" class="btn">Verify & Save</button>
+        
+        <div id="success" class="alert alert-success hide" style="margin-top:20px"><b>Success:</b> Authentication verified & details saved</div>
+        <div id="error" class="alert alert-error hide" style="margin-top:20px"></div>
     </div>
 
     <div id="available-apps"></div>
@@ -64,10 +64,12 @@ $("#connect").click(function() {
     
     $.ajax({ type: "POST", url: path+"remoteaccess/connect", data: "host="+host+"&username="+username+"&password="+password, async: false, success: function(result){ 
         if (result.success!=undefined && result.success) {
-            $("#apikey").val(result.apikey_write);
-            $("#apikey").css("background-color","rgba(0,255,0,0.3)");
+            $("#success").show();
+            $("#error").hide();
         } else {
-            alert("Emoncms account does not exist");
+            $("#error").html("<b>Error:</b> "+result.message);
+            $("#error").show();
+            $("#success").hide();
         }
     }});
 });
