@@ -18,7 +18,7 @@ if path.isfile(config_path) is False:
     logging.error('config file not found')
     sys.exit(0)
 else:
-    with open('remoteaccess.json') as config_file:  
+    with open(config_path) as config_file:  
         config = json.load(config_file)
 
 #-----------------------------------------------------------
