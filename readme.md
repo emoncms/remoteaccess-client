@@ -1,5 +1,9 @@
 # Emoncms Remote Access (Alpha)
 
+## How this works
+
+![remoteaccess_diagram.png](files/remoteaccess_diagram.jpg)
+
 Background discussion: [https://community.openenergymonitor.org/t/emoncms-local-vs-remote/7268](https://community.openenergymonitor.org/t/emoncms-local-vs-remote/7268)
 
 1. User Guide
