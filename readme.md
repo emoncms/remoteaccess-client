@@ -31,3 +31,17 @@ Optional: View service log:
 ## Install Client Emoncms Module
 
     ln -s /home/pi/remoteaccess-client/remoteaccess /var/www/emoncms/Modules/remoteaccess
+    
+## Configure Client
+
+Login to the local emoncms account you wish to access remotely and navigate to the remoteaccess module in the Extra menu. Enter remote emoncms.org username and password, click verify and save to complete.
+
+![remoteauth.png](files/remoteauth.png)
+
+Check the access control list on the second page, make sure you are happy with the level of access. You can expand or restrict access here as needed. You may want to disable all remote write access for example or only allow remote access to read the feed list.
+
+![accesscontrol.png](files/accesscontrol.png)
+
+Login to mqtt.emoncms.org with remote emoncms account credentials to access your emonbase/emonpi remotely!
+
+![feedlist.png](files/feedlist.png)
