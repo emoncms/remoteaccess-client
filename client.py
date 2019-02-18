@@ -28,7 +28,8 @@ else:
 host = config['MQTT_HOST']
 username = config['MQTT_USERNAME']
 password = config['MQTT_PASSWORD']
-apikey = config['EMONCMS_APIKEY']
+apikey_write = config['APIKEY_WRITE']
+apikey_read = config['APIKEY_READ']
 port = int(config['MQTT_PORT'])
 tls = config['MQTT_TLS']
 mode = config['APP_ENV']
@@ -39,7 +40,6 @@ if mode == 'production':
     logging_level = logging.ERROR
 else:
     logging_level = logging.DEBUG
-
 #-----------------------------------------------------------
 
 # set the logging level and format
@@ -71,10 +71,7 @@ emoncms = {
     "protocol" : "http://",
     "host" : "localhost",
     "port" : "80",
-    "path" : "/emoncms/feed/list.json",
-    "parameters" : {
-        "apikey" : apikey
-    }
+    "path" : "/emoncms/feed/list.json"
 }
 # display all mqtt settings if APP_ENV == 'development'
 logging.debug("Settings: %s, %s, %s, %s. TLS:%s, %s", mqtt["clientId"], mqtt["host"], mqtt["pubTopic"], mqtt["subTopic"], mqtt["tls"], mqtt["transport"])
@@ -168,7 +165,7 @@ def on_message(client, obj, msg):
         msg - an instance of MQTTMessage. This is a class with members topic, payload, qos, retain
 
     """
-    logging.debug('onMessage: ' + msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
+    logging.debug('onMessage: ' + str(msg.topic) + " " + str(msg.qos) + " " + str(msg.payload))
     message = msg.payload.decode("utf-8")
     # NEED TO ENSURE OTHER CLIENTS SET will TO - payload: 'DISCONNECTED CLIENT ' + CLIENT_ID + '--------',
     if(message.startswith('DISCONNECTED')) :
@@ -248,16 +245,16 @@ def call_api(msg):
     action = request['controller'] + "/" + request['action']
 
     if not action in access_control:
-        logging.error('action %s not found in whitelist' % data['action'])
+        logging.error('action %s not found in whitelist' % action)
         return
-
+                 
     # Build path
     path = "/emoncms"
     if 'controller' in request:
         path += "/"+request['controller']
     if 'action' in request:
         path += "/"+request['action']
-    if 'subaction' in request:
+    if 'subaction' in request and request['subaction']!="":
         path += "/"+request['subaction']
     
     # Query param and apikey are not allowed    
@@ -267,11 +264,14 @@ def call_api(msg):
     if 'apikey' in request["data"]:
         logging.error('apikey not allowed')
         return
-        
+    
+    params = {}
     if 'data' in request:
-        params = merge_two_dicts(data["parameters"], request["data"])
-    else:
-        params = data["parameters"]
+        params = merge_two_dicts(params, request["data"])
+
+    params["apikey"] = apikey_read    
+    if access_control[action]=="write":
+        params["apikey"] = apikey_write
 
     url_params = '?' + urllib.urlencode(params)
     url = "%s%s:%s%s.json%s" % (data["protocol"], data["host"], data["port"], path, url_params)
