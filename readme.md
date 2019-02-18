@@ -1,7 +1,5 @@
 # Emoncms Remote Access (Alpha)
 
-This concept is still work in progress. Expect buggy results for now.
-
 Background discussion: [https://community.openenergymonitor.org/t/emoncms-local-vs-remote/7268](https://community.openenergymonitor.org/t/emoncms-local-vs-remote/7268)
 
 ## Login on mqtt.emoncms.org
@@ -17,28 +15,8 @@ Create remoteaccess.env settings file with emoncms.org username and password.
     cd ~/ 
     git clone https://github.com/emoncms/remoteaccess-client
     cd remoteaccess-client
-    cp remoteaccess.env.example remoteaccess.env
-    nano remoteaccess.env
-
-Enter your **Local Emoncms** apikey and MQTT username / password is your **Remote Emoncms.org** account username and password to connect:
-
-    # application mode
-    APP_ENV='production'
-    # emoncms api write key
-    EMONCMS_APIKEY='apikey'
-    # mqtt broker connection
-    MQTT_HOST='mqtt.emoncms.org'
-    MQTT_USERNAME='username'
-    MQTT_PASSWORD='password'
-    MQTT_PORT=8883
-    MQTT_TLS=true
-
-    # Save As remoteaccess.env for production
-    # Save As remoteaccess.env.dev for development
-
-Install python dependencies:
-
-    pip install python-dotenv
+    cp remoteaccess.json.example remoteaccess.json
+    sudo chmod 666 remoteaccess.json
 
 Install and start remoteaccess service:
 
@@ -46,10 +24,9 @@ Install and start remoteaccess service:
     sudo systemctl enable remoteaccess.service
     sudo systemctl start remoteaccess
     
-View service log:
+Optional: View service log:
 
     journalctl -f -u remoteaccess -n 100
-
 
 ## Install Client Emoncms Module
 
