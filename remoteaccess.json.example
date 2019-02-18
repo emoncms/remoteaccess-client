@@ -1,0 +1,26 @@
+{
+    "APP_ENV": "dev",
+    "APIKEY_WRITE": "",
+    "APIKEY_READ": "",
+    "MQTT_HOST": "mqtt.emoncms.org",
+    "MQTT_USERNAME": "",
+    "MQTT_PASSWORD": "",
+    "MQTT_PORT": 8883,
+    "MQTT_TLS": true,
+    "MQTT_TRANSPORT": "tcp",
+    "ACCESS_CONTROL": {
+        "app\/list": "read",
+        "feed\/list": "read",
+        "feed\/data": "read",
+        "feed\/value": "read",
+        "feed\/timevalue": "read",
+        "feed\/listwithmeta": "read",
+        "feed\/fetch": "read",
+        "device\/list": "read",
+        "demandshaper\/get": "read",
+        "demandshaper\/submit": "write",
+        "input\/get": "read",
+        "input\/list": "read",
+        "test\/test": "read"
+    }
+}
