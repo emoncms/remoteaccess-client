@@ -13,7 +13,7 @@ This implementation uses MQTTS to do this:
 1. The local emoncms installation has an always running python client that connects and subscribes to a MQTT broker on the remote server - waiting for request commands. 
 2. HTTP requests to the online server are translated to MQTT messages that contain the description of the request. These are published to the subscribing users request topic.
 3. The local client receives the request and translates it into a HTTP request to the local emoncms HTTP api. The response is then sent back to remote server via the users response topic.
-4. The remote server sends the response as a response to to the original HTTP request. This all happens in short enough time for the process to be syncronous (so far in testing).
+4. The remote server sends the response as a response to to the original HTTP request. This all happens in short enough time for the process to be synchronous (so far in testing).
 5. The remote server web view displays the result e.g feed list or graph.
 
 The MQTT communication is all done over TLS for security. The remote server can be accessed over HTTPS.<br>
