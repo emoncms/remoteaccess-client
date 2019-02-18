@@ -308,6 +308,8 @@ def connect():
         except: # catch *all* exceptions
             e = sys.exc_info()[0]
             logging.error("Error: %s" % e)
+    else:
+        logging.debug("empty configuration")
 
 def merge_two_dicts(x, y):
     """ return new dict based on x and y being merged

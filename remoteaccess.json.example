@@ -1,5 +1,5 @@
 {
-    "APP_ENV": "dev",
+    "APP_ENV": "production",
     "APIKEY_WRITE": "",
     "APIKEY_READ": "",
     "MQTT_HOST": "mqtt.emoncms.org",
