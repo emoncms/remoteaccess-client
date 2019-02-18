@@ -2,7 +2,7 @@
 
 ## How this works
 
-A key drawback with logging data locally on an EmonPi or EmonBase is that it is harder to access data remotely while away from the home. Setting up remote access the traditional way with port forwarding is a relatively complex and can be insecure, see [guide: remote access](https://guide.openenergymonitor.org/setup/remote-access/). 
+Following on from the forum thread: [Emoncms local vs remote](https://community.openenergymonitor.org/t/emoncms-local-vs-remote/7268) a key drawback with logging data locally on an EmonPi or EmonBase is that it is harder to access data remotely while away from the home. Setting up remote access the traditional way with port forwarding is a relatively complex and can be insecure, see [guide: remote access](https://guide.openenergymonitor.org/setup/remote-access/). 
 
 Newer services such as dataplicity are fantastic providing full SSH access as well as web view, we use them ourselves and recommend them in our guide. Dataplicity offer a single free account ideal for home users.
 
@@ -23,7 +23,7 @@ The performance appears surprisingly good in testing so far.
 
 ![remoteaccess_diagram.png](files/remoteaccess_diagram.jpg)
 
-Background discussion: [https://community.openenergymonitor.org/t/emoncms-local-vs-remote/7268](https://community.openenergymonitor.org/t/emoncms-local-vs-remote/7268)
+---
 
 1. User Guide
 2. Installation Guide
