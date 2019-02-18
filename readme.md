@@ -16,6 +16,10 @@ This implementation uses MQTTS to do this:
 4. The remote server sends the response as a response to to the original HTTP request. This all happens in short enough time for the process to be syncronous (so far in testing).
 5. The remote server web view displays the result e.g feed list or graph.
 
+The MQTT communication is all done over TLS for security. The remote server can be accessed over HTTPS.<br>
+The performance appears surprisingly good in testing so far.
+
+**System Diagram**
 
 ![remoteaccess_diagram.png](files/remoteaccess_diagram.jpg)
 
