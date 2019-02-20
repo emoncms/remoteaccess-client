@@ -21,6 +21,8 @@
         "demandshaper\/submit": "write",
         "input\/get": "read",
         "input\/list": "read",
-        "test\/test": "read"
+        "test\/test": "read",
+        "device\/authcheck": "read",
+        "device\/authallow": "write"
     }
 }
