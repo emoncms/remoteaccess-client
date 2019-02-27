@@ -1,25 +1,19 @@
 <?php
-
-    $domain = "messages";
-
-    $menu_left[] = array(
-        'id'=>"remoteaccess_menu",
-        'name'=>"RemoteAccess", 
-        'path'=>"remoteaccess/view" , 
-        'session'=>"write", 
-        'order' => 0,
-        'icon'=>'icon-home icon-white',
-        'hideinactive'=>1
+    
+    $menu['sidebar']['setup'][] = array(
+        'text' => _("RemoteAccess"),
+        'title' => _("Remote Access"),
+        'path' => 'remoteaccess/view',
+        'icon' => 'earth'
     );
 
-    $menu_dropdown[] = array(
-        'id'=>"remoteaccess_menu_extras",
-        'name'=>"RemoteAccess", 
-        'path'=>"remoteaccess/view" , 
-        'session'=>"write", 
-        'order' => 0,
-        'icon'=>'icon-home'
+    $menu['sidebar']['remoteaccess'][] = array(
+        'text' => '1. '._("Connect"),
+        'path' => 'remoteaccess/view/1',
+        'order' => 1
     );
-    
-    
-
+    $menu['sidebar']['remoteaccess'][] = array(
+        'text' => '2. '._("Access Control"),
+        'path' => 'remoteaccess/view/2',
+        'order' => 2
+    );
