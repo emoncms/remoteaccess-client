@@ -8,79 +8,73 @@ import requests as requests
 import paho.mqtt.client as paho
 import os
 import urllib
+import hashlib
 from os import path, getenv
-from dotenv import load_dotenv
 
-_dir = path.dirname(path.abspath(__file__))
-
+_dir = path.dirname(path.abspath(__file__))    
 # Load file from the path.
-dotenv_path = path.join(_dir, 'remoteaccess.env.dev')
-if path.isfile(dotenv_path) is False:
-    # Load local dev version if exists
-    dotenv_path = path.join(_dir, 'remoteaccess.env')
+config_path = path.join(_dir, 'remoteaccess.json')
+#if path.isfile(config_path) is False:
+    #config_path = path.join(_dir, 'remoteaccess.json.example')
 
-if path.isfile(dotenv_path) is False:
-    logging.error('.env file not found')
-    sys.exit(0)
-else:
-    load_dotenv(dotenv_path)
+config = {}
 
-#-----------------------------------------------------------
-#-      SETTINGS
-#-----------------------------------------------------------
-
-host = getenv('MQTT_HOST')
-username = getenv('MQTT_USERNAME')
-password = getenv('MQTT_PASSWORD')
-apikey = getenv('EMONCMS_APIKEY')
-port = int(getenv('MQTT_PORT'))
-tls = getenv('MQTT_TLS').lower() == 'true'
-mode = getenv('APP_ENV')
-mqtt_transport = getenv('MQTT_TRANSPORT')
-
-if mode == 'production':
-    logging_level = logging.ERROR
-else:
-    logging_level = logging.DEBUG
-
-#-----------------------------------------------------------
-
-# set the logging level and format
-if logging_level == logging.DEBUG:
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging_level)
-else:
-    logging.basicConfig(format='%(message)s', level=logging_level)
-
-#mqtt production settings
-client_id = "%s_python" % username
 mqtt = {
-    "host" : host,
-    "username" : username,
-    "password" : password,
-    "port" : port,
-    "pubTopic" : "user/%s/response/" % (username) ,
-    "subTopic" : "user/%s/request" % username,
-    "retry" : 5,
-    "delay" : 2,
-    "counter" : 0,
-    "client" : None,
-    "tls" : tls,
-    "clientId" : client_id,
-    "transport" : mqtt_transport
+    "client": None,
+    "retry": 5,
+    "delay": 2,
+    "counter": 0,
+    "connected": False
 }
 
-# emoncms settings
 emoncms = {
     "protocol" : "http://",
     "host" : "localhost",
     "port" : "80",
-    "path" : "/emoncms/feed/list.json",
-    "parameters" : {
-        "apikey" : apikey
-    }
+    "path" : "/emoncms/feed/list.json"
 }
-# display all mqtt settings if APP_ENV == 'development'
-logging.debug("Settings: %s, %s, %s, %s. TLS:%s, %s", mqtt["clientId"], mqtt["host"], mqtt["pubTopic"], mqtt["subTopic"], mqtt["tls"], mqtt["transport"])
+
+# ------------------------------------------------------------------------------------------
+# Load configuration
+# ------------------------------------------------------------------------------------------
+def load_configuration():
+    global config
+    global mqtt 
+    
+    # Load file from the path.
+    if path.isfile(config_path) is False:
+        logging.error('config file not found')
+        sys.exit(0)
+    else:
+        with open(config_path) as config_file: 
+            _config = json.load(config_file)
+    
+    config = {
+        "mode":_config['APP_ENV'],
+        "apikey_write":_config['APIKEY_WRITE'],
+        "apikey_read":_config['APIKEY_READ'],
+        "access_control":_config['ACCESS_CONTROL']
+    }
+    
+    mqtt["host"] = _config['MQTT_HOST']
+    mqtt["username"] = _config['MQTT_USERNAME']
+    mqtt["password"] = _config['MQTT_PASSWORD']
+    mqtt["port"] = int(_config['MQTT_PORT'])
+    mqtt["pubTopic"] = "user/%s/response/" % (_config['MQTT_USERNAME'])
+    mqtt["subTopic"] = "user/%s/request" % _config['MQTT_USERNAME']
+    mqtt["tls"] = _config['MQTT_TLS']
+    mqtt["clientId"] = "%s_python" % _config['MQTT_USERNAME']
+    mqtt["transport"] = _config['MQTT_TRANSPORT']
+
+    if config['mode'] == 'production':
+        logging.basicConfig(format='%(message)s', level=logging.ERROR)
+    else:
+        logging.basicConfig(format='%(message)s', level=logging.DEBUG)    
+
+    # display all mqtt settings if APP_ENV == 'development'
+    logging.debug("Settings: %s, %s, %s, %s. TLS:%s, %s", mqtt["clientId"], mqtt["host"], mqtt["pubTopic"], mqtt["subTopic"], mqtt["tls"], mqtt["transport"])
+
+# ------------------------------------------------------------------------------------------
 
 def initialize():
     """ init function with exception handling.
@@ -101,31 +95,27 @@ def initialize():
 
         logging.debug("Connecting to: %s " % mqtt["host"])
         
+        mqtt["client"].enable_logger(logger=logging)
+        if mqtt["tls"] == True:
+            setTLS()
+            
         connect()
-        mqtt["client"].loop_forever(timeout = mqtt["delay"])        
 
     except TypeError as err:
         logging.error('Error creating connection. %s' % err)
         return
-
     except ValueError as err:
         logging.error("%s: %s" % err, err.args)
         return
-
     except Exception as inst:
         logging.error("Error: %s. %s", inst.args[0], inst.args[1])
         raise
-
     except: # catch *all* exceptions
         e = sys.exc_info()[0]
         logging.error("Error: %s" % e)
-
     finally:
-        if mqtt["client"] is not None:
-            mqtt["client"].loop_stop()
-
-        logging.info("Exit. RemoteAccess service will retry script in 60s")
-
+        pass 
+        
         return
 
 #####
@@ -145,21 +135,12 @@ def on_connect(client, obj, flags, rc):
     """
     global mqtt
     logging.debug(paho.connack_string(rc))
-
+    
     if rc == 0:
-        mqtt["counter"] = 0 # reset counter on sucessful connection
-        logging.info("Connected to broker: %s" % host)
+        mqtt["connected"] = True
+        logging.info("Connected to broker: %s" % mqtt["host"])
         logging.debug("Subscribing to \"%s\"", mqtt["subTopic"])
         client.subscribe(mqtt["subTopic"])  # subscribe
-    else:
-        if mqtt["counter"] < mqtt["retry"]:
-            logging.info("Reconnecting...")
-            logging.debug("Waiting %s before retry" % mqtt["delay"])
-            time.sleep(mqtt["delay"])
-            connect()
-        else:
-            logging.info("Error. Disconnecting from broker.")
-            client.disconnect()
 
 
 def on_message(client, obj, msg):
@@ -171,7 +152,7 @@ def on_message(client, obj, msg):
         msg - an instance of MQTTMessage. This is a class with members topic, payload, qos, retain
 
     """
-    logging.debug('onMessage: ' + msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
+    logging.debug('onMessage: ' + str(msg.topic) + " " + str(msg.qos) + " " + str(msg.payload))
     message = msg.payload.decode("utf-8")
     # NEED TO ENSURE OTHER CLIENTS SET will TO - payload: 'DISCONNECTED CLIENT ' + CLIENT_ID + '--------',
     if(message.startswith('DISCONNECTED')) :
@@ -220,18 +201,9 @@ def on_disconnect(client, userdata, rc=0):
 
     """
     global mqtt
-    logging.debug("Disconnected (%s)" % mqtt["counter"])
-    if mqtt["counter"] < mqtt["retry"]:
-        logging.info("Reconnecting...")
-        logging.debug("Waiting %s before retry" % mqtt["delay"])
-        time.sleep(mqtt["delay"])
-        connect()
-    else:
-        client.loop_stop()
-        logging.debug("Write to error log")
-        exit()
-###
-
+    mqtt["connected"] = False
+    logging.debug("Disconnected from broker")
+    
 
 def call_api(msg):
     """ Relay the message payload as an API call on the local emonCMS
@@ -248,16 +220,36 @@ def call_api(msg):
     
     # data['q'] = '' # overwrite modrewrite's "q" parameter
     # only allow these endpoints
-    whitelist = ['app/list','feed/list', 'feed/data', 'feed/value', 'feed/timevalue', 'feed/listwithmeta', 'feed/fetch']
-    if not data['action'] in whitelist:
-        logging.error('action %s not found in whitelist' % data['action'])
-        return
+    action = request['controller'] + "/" + request['action']
 
-    path = "/emoncms/" + data["action"]
+    if not action in config["access_control"]:
+        logging.error('action %s not found in whitelist' % action)
+        return
+                 
+    # Build path
+    path = "/emoncms"
+    if 'controller' in request:
+        path += "/"+request['controller']
+    if 'action' in request:
+        path += "/"+request['action']
+    if 'subaction' in request and request['subaction']!="":
+        path += "/"+request['subaction']
+    
+    # Query param and apikey are not allowed    
+    if 'q' in request["data"]:
+        logging.error('param q not allowed')
+        return
+    if 'apikey' in request["data"]:
+        logging.error('apikey not allowed')
+        return
+    
+    params = {}
     if 'data' in request:
-        params = merge_two_dicts(data["parameters"], request["data"])
-    else:
-        params = data["parameters"]
+        params = merge_two_dicts(params, request["data"])
+
+    params["apikey"] = config["apikey_read"]    
+    if config["access_control"][action]=="write":
+        params["apikey"] = config["apikey_write"]
 
     url_params = '?' + urllib.urlencode(params)
     url = "%s%s:%s%s.json%s" % (data["protocol"], data["host"], data["port"], path, url_params)
@@ -308,15 +300,16 @@ def connect():
         counts number of connection attempts
     """
     global mqtt
-    mqtt["client"].enable_logger(logger=logging)
-
-    if mqtt["tls"] == True:
-        setTLS()
-
-    logging.debug("Attempt %s" % mqtt["counter"])
-    mqtt["counter"] += 1
-    mqtt["client"].username_pw_set(mqtt["username"], mqtt["password"])
-    mqtt["client"].connect(mqtt["host"], mqtt["port"], 60) # connect
+    if mqtt["host"]!="" and mqtt["username"]!="" and mqtt["password"]!="":
+        logging.debug("Connecting to broker...")
+        try:
+            mqtt["client"].username_pw_set(mqtt["username"], mqtt["password"])
+            mqtt["client"].connect(mqtt["host"], mqtt["port"], 60) # connect
+        except: # catch *all* exceptions
+            e = sys.exc_info()[0]
+            logging.error("Error: %s" % e)
+    else:
+        logging.debug("empty configuration")
 
 def merge_two_dicts(x, y):
     """ return new dict based on x and y being merged
@@ -326,5 +319,33 @@ def merge_two_dicts(x, y):
     z.update(y)    # modifies z with y's keys and values & returns None
     return z
 
+
 """ start the script """
+load_configuration()
 initialize()
+
+lastconfigcheck = time.time()
+current_md5 = hashlib.md5(open(config_path,'rb').read()).hexdigest()
+
+last_retry_connect = time.time()
+
+while True:
+    # Check for updated config every 5s
+    if (time.time()-lastconfigcheck)>5.0:
+        lastconfigcheck = time.time()
+        # Get md5 of config file
+        last_md5 = current_md5
+        current_md5 = hashlib.md5(open(config_path,'rb').read()).hexdigest()
+        # If the configuration has changed load the new one
+        if last_md5!=current_md5:
+            logging.debug("config file changed")
+            load_configuration()
+            mqtt["client"].disconnect()
+            
+    # Retry connection
+    if mqtt["connected"]==False and (time.time()-last_retry_connect)>10.0:
+        last_retry_connect = time.time()
+        connect()
+
+    mqtt["client"].loop(0)
+    time.sleep(0.01);

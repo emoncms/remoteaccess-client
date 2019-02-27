@@ -7,14 +7,13 @@ function remoteaccess_controller() {
 
     global $session, $route, $homedir, $user;
     
+    $config_file = $homedir."/remoteaccess-client/remoteaccess.json";
+    
     // Default route format
     $route->format = 'json';
     
     // Result can be passed back at the end or part way in the controller
     $result = false;
-    
-    require "Modules/remoteaccess/remoteaccess_model.php";
-    $remoteaccess = new RemoteAccess();
     
     // Read access API's and pages
     if ($session['read']) {
@@ -25,7 +24,14 @@ function remoteaccess_controller() {
     if ($session['write']) {
         if ($route->action == "view") {
             $route->format = 'html';
-            return view("Modules/remoteaccess/remoteaccess_view.php", array());
+            
+            $config = new stdClass();
+            if (file_exists($config_file)) {
+                $config = json_decode(file_get_contents($config_file));
+            } else {
+                $config = json_decode(file_get_contents("$config_file.example"));
+            }
+            return view("Modules/remoteaccess/remoteaccess_view.php", array("config"=>$config));
         }
         
     
@@ -41,18 +47,57 @@ function remoteaccess_controller() {
             )));
             
             if (isset($result->success) && $result->success) {
-                $env = $remoteaccess->load_env($homedir."/remoteaccess-client/remoteaccess.env");
-                if ($env) {
+                $config = new stdClass();
+                if (file_exists($config_file)) {
+                    $config = json_decode(file_get_contents($config_file));
+                } else {
+                    $config = json_decode(file_get_contents("$config_file.example"));
+                }
+            
+                if ($config!=null) {
                     $u = $user->get($session["userid"]);
-                    $env["EMONCMS_APIKEY"] = $u->apikey_read;
-                    $env["MQTT_HOST"] = $host;
-                    $env["MQTT_USERNAME"] = $username;
-                    $env["MQTT_PASSWORD"] = $password;
-                    $remoteaccess->save_env($homedir."/remoteaccess-client/remoteaccess.env",$env);
+                    $config->APIKEY_WRITE = $u->apikey_write;
+                    $config->APIKEY_READ = $u->apikey_read;
+                    $config->MQTT_HOST = $host;
+                    $config->MQTT_USERNAME = $username;
+                    $config->MQTT_PASSWORD = $password;
+                    $fh = fopen($homedir."/remoteaccess-client/remoteaccess.json","w");
+                    fwrite($fh,json_encode($config, JSON_PRETTY_PRINT));
+                    fclose($fh);
                 }
             }
             return $result;
-        }   
+        }
+
+        if ($route->action == 'saveaccesscontrol') {
+            $route->format = "json";
+            $accesscontrol = json_decode(post("accesscontrol"));
+            
+            if ($accesscontrol==null) {
+                 return array("success"=>false,"message"=>"Invalid JSON");
+            }
+            
+            if (file_exists($config_file)) {
+                $config = json_decode(file_get_contents($config_file));
+            } else {
+                $config = json_decode(file_get_contents("$config_file.example"));
+            }
+            
+            $config->ACCESS_CONTROL = new stdClass(); 
+            foreach ($accesscontrol as $key=>$val) {
+                if (preg_replace('/[^\p{N}\p{L}\/_-]/u','',$key)!=$key) return array('success'=>false, 'message'=>'invalid characters in path');
+            
+                if ($val=="read" || $val=="write") {
+                    $config->ACCESS_CONTROL->$key = $val;
+                }
+            }
+            
+            $fh = fopen($homedir."/remoteaccess-client/remoteaccess.json","w");
+            fwrite($fh,json_encode($config, JSON_PRETTY_PRINT));
+            fclose($fh);
+            
+            return array("success"=>true,"message"=>"Access control saved");
+        }     
     }
 
     // Pass back result
