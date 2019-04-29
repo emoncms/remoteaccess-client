@@ -17,18 +17,11 @@
 }
 </style>
 
+<ul class="nav nav-tabs mb-0 mt-3" id="backup-tabs">
+    <li class="active"><a href="#remoteauth">1. Remote Auth</a></li>
+    <li><a href="#accesscontrol">2. Access Control</a></li>
+</ul>
 
-<div id="wrapper">
-  <div class="sidenav">
-    <div class="sidenav-inner">
-      
-      <ul class="sidenav-menu">
-          <li><a href="<?php echo $path; ?>remoteaccess/view#remoteauth">1. Remote Auth</a></li>
-          <li><a href="<?php echo $path; ?>remoteaccess/view#accesscontrol">2. Access Control</a></li>
-      </ul>
-      
-    </div>
-  </div>
 
   <div class="remoteaccess-page">
 
@@ -71,7 +64,6 @@
     </div>
 
   </div>
-</div>
 
 <script type="text/javascript" src="<?php echo $path; ?>Lib/misc/sidebar.js?v=<?php echo $version; ?>"></script>
 
