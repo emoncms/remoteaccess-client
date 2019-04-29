@@ -23,7 +23,7 @@
 </ul>
 
 
-  <div class="remoteaccess-page">
+  <div class="remoteaccess-page tab-content">
 
     <h2>Emoncms Remote Access</h2>
     <p>Access your local emoncms installation remotely</p>
