@@ -17,9 +17,9 @@
 }
 </style>
 
-<ul class="nav nav-tabs mb-0 mt-3" id="backup-tabs">
-    <li class="active"><a href="#remoteauth">1. Remote Auth</a></li>
-    <li><a href="#accesscontrol">2. Access Control</a></li>
+<ul class="nav nav-tabs mb-0 mt-3" id="nav-tabs">
+    <li class="active"><a href="#view-remoteauth">1. Remote Auth</a></li>
+    <li><a href="#view-accesscontrol">2. Access Control</a></li>
 </ul>
 
 
@@ -28,7 +28,7 @@
     <h2>Emoncms Remote Access</h2>
     <p>Access your local emoncms installation remotely</p>
     
-    <div id="view-remoteauth" style="background-color:#eee; padding:20px; max-width:600px">
+    <div id="view-remoteauth" style="background-color:#eee; padding:20px; max-width:600px" class="tab-pane active">
         <h4>Remote Auth</h4>
         <p style="color:#666">Enter host, username and password of remote account</p>
         <label>Host (default: mqtt.emoncms.org):</label>
@@ -45,7 +45,7 @@
         <div id="success" class="alert alert-success hide" style="margin-top:20px"><b>Success:</b> Authentication verified & details saved</div>
         <div id="error" class="alert alert-error hide" style="margin-top:20px"></div>
     </div>
-    <div id="view-accesscontrol" style="background-color:#eee; padding:20px; max-width:600px" class="hide">
+    <div id="view-accesscontrol" style="background-color:#eee; padding:20px; max-width:600px" class="tab-pane">
     
         <h4>Access Control</h4>
         <p style="color:#666">List of allowed API end points and access level.</p>
@@ -176,7 +176,7 @@ function save_access_control() {
 
 $(function () {
     // trigger tab open on click (adding hash to location)
-    $('#backup-tabs a').click(function (e) {
+    $('#nav-tabs a').click(function (e) {
         e.preventDefault();
         var href = $(e.target).attr('href');
         selectTab(href.replace('view-',''));
