@@ -1,33 +1,14 @@
-<?php 
-    global $path; 
-    $version = 1;
-?>
-
-<link rel="stylesheet" href="<?php echo $path; ?>Lib/misc/sidebar.css?v=<?php echo $version; ?>">
-<style>
-.remoteaccess-page {
-    max-width:640px;
-    padding:20px;
-}
-
-@media (max-width: 767px) {
-    .remoteaccess-page {
-        padding:0px;
-    }
-}
-</style>
-
 <ul class="nav nav-tabs mb-0 mt-3" id="nav-tabs">
     <li class="active"><a href="#view-remoteauth">1. Remote Auth</a></li>
     <li><a href="#view-accesscontrol">2. Access Control</a></li>
 </ul>
 
 
-  <div class="remoteaccess-page tab-content">
+<div class="tab-content">
 
     <h2>Emoncms Remote Access</h2>
     <p>Access your local emoncms installation remotely</p>
-    
+
     <div id="view-remoteauth" style="background-color:#eee; padding:20px; max-width:600px" class="tab-pane active">
         <h4>Remote Auth</h4>
         <p style="color:#666">Enter host, username and password of remote account</p>
@@ -45,15 +26,14 @@
         <div id="success" class="alert alert-success hide" style="margin-top:20px"><b>Success:</b> Authentication verified & details saved</div>
         <div id="error" class="alert alert-error hide" style="margin-top:20px"></div>
     </div>
+
     <div id="view-accesscontrol" style="background-color:#eee; padding:20px; max-width:600px" class="tab-pane">
-    
         <h4>Access Control</h4>
         <p style="color:#666">List of allowed API end points and access level.</p>
         <table class="table" style="margin-top:20px">
             <tr><th>Path</th><th>Access</th><th></th></tr>
             <tbody id="access_control"></tbody>
         </table>
-        
         <p style="color:#666">Add end point:</p>
         <div class="input-prepend input-append">
             <div class="add-on">Path</div>
@@ -63,9 +43,7 @@
         </div>
     </div>
 
-  </div>
-
-<script type="text/javascript" src="<?php echo $path; ?>Lib/misc/sidebar.js?v=<?php echo $version; ?>"></script>
+</div>
 
 <script>
 init_sidebar({menu_element:"#remoteaccess_menu"});
