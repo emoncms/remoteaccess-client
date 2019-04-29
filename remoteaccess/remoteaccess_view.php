@@ -77,18 +77,18 @@
 
 <script>
 init_sidebar({menu_element:"#remoteaccess_menu"});
-var path = "<?php echo $path; ?>";
+// var path = "<?php echo $path; ?>";
 var config = <?php echo json_encode($config); ?>;
 
-if (location.hash=="#remoteauth") {
-    $("#view-accesscontrol").hide();
-    $("#view-remoteauth").show();
-}
+// if (location.hash=="#remoteauth") {
+//     $("#view-accesscontrol").hide();
+//     $("#view-remoteauth").show();
+// }
 
-if (location.hash=="#accesscontrol") {
-    $("#view-accesscontrol").show();
-    $("#view-remoteauth").hide();
-}
+// if (location.hash=="#accesscontrol") {
+//     $("#view-accesscontrol").show();
+//     $("#view-remoteauth").hide();
+// }
 
 $("#host").val(config.MQTT_HOST);
 $("#username").val(config.MQTT_USERNAME);
@@ -144,17 +144,17 @@ $("#add_endpoint").click(function() {
     save_access_control();
 });
 
-$(window).bind( 'hashchange', function(e) { 
-    if (location.hash=="#remoteauth") {
-        $("#view-accesscontrol").hide();
-        $("#view-remoteauth").show();
-    }
+// $(window).bind( 'hashchange', function(e) { 
+//     if (location.hash=="#remoteauth") {
+//         $("#view-accesscontrol").hide();
+//         $("#view-remoteauth").show();
+//     }
     
-    if (location.hash=="#accesscontrol") {
-        $("#view-accesscontrol").show();
-        $("#view-remoteauth").hide();
-    }
-});
+//     if (location.hash=="#accesscontrol") {
+//         $("#view-accesscontrol").show();
+//         $("#view-remoteauth").hide();
+//     }
+// });
 
 function draw_access_control() {
     var out = "";
@@ -179,5 +179,40 @@ function save_access_control() {
             alert(result.message);
         }
     }});
+}
+
+
+$(function () {
+    // trigger tab open on click (adding hash to location)
+    $('#backup-tabs a').click(function (e) {
+        e.preventDefault();
+        var href = $(e.target).attr('href');
+        selectTab(href.replace('view-',''));
+        // show tab
+        $(this).tab('show');
+        // change hash
+        location.hash = href.replace('view-','');
+    })
+    // pre-select tab on load
+    // @todo: fix slight delay from ajax calls
+    selectTab();
+
+    // on hash change
+    $(window).on('hashchange', function(event) {
+        selectTab(location.hash);
+    })
+})
+/**
+ * loop through all tabs and highlight one if given [hash] is a match
+ */
+function selectTab(hash) {
+    hash = hash || location.hash;
+
+    $.each($('#backup-tabs a'), function(i,elem) {
+        var $tab = $(elem);
+        if($tab.attr('href') == hash.replace('#','#view-')) {
+            $tab.tab('show');
+        }
+    });
 }
 </script>
