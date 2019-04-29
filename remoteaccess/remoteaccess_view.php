@@ -69,18 +69,7 @@
 
 <script>
 init_sidebar({menu_element:"#remoteaccess_menu"});
-// var path = "<?php echo $path; ?>";
 var config = <?php echo json_encode($config); ?>;
-
-// if (location.hash=="#remoteauth") {
-//     $("#view-accesscontrol").hide();
-//     $("#view-remoteauth").show();
-// }
-
-// if (location.hash=="#accesscontrol") {
-//     $("#view-accesscontrol").show();
-//     $("#view-remoteauth").hide();
-// }
 
 $("#host").val(config.MQTT_HOST);
 $("#username").val(config.MQTT_USERNAME);
@@ -135,18 +124,6 @@ $("#add_endpoint").click(function() {
     draw_access_control();
     save_access_control();
 });
-
-// $(window).bind( 'hashchange', function(e) { 
-//     if (location.hash=="#remoteauth") {
-//         $("#view-accesscontrol").hide();
-//         $("#view-remoteauth").show();
-//     }
-    
-//     if (location.hash=="#accesscontrol") {
-//         $("#view-accesscontrol").show();
-//         $("#view-remoteauth").hide();
-//     }
-// });
 
 function draw_access_control() {
     var out = "";
