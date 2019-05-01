@@ -1,41 +1,15 @@
-<?php 
-    global $path; 
-    $version = 1;
-?>
-
-<link rel="stylesheet" href="<?php echo $path; ?>Lib/misc/sidebar.css?v=<?php echo $version; ?>">
-<style>
-.remoteaccess-page {
-    max-width:640px;
-    padding:20px;
-}
-
-@media (max-width: 767px) {
-    .remoteaccess-page {
-        padding:0px;
-    }
-}
-</style>
+<ul class="nav nav-tabs mb-0 mt-3" id="nav-tabs">
+    <li class="active"><a href="#view-remoteauth">1. Remote Auth</a></li>
+    <li><a href="#view-accesscontrol">2. Access Control</a></li>
+</ul>
 
 
-<div id="wrapper">
-  <div class="sidenav">
-    <div class="sidenav-inner">
-      
-      <ul class="sidenav-menu">
-          <li><a href="<?php echo $path; ?>remoteaccess/view#remoteauth">1. Remote Auth</a></li>
-          <li><a href="<?php echo $path; ?>remoteaccess/view#accesscontrol">2. Access Control</a></li>
-      </ul>
-      
-    </div>
-  </div>
-
-  <div class="remoteaccess-page">
+<div class="tab-content">
 
     <h2>Emoncms Remote Access</h2>
     <p>Access your local emoncms installation remotely</p>
-    
-    <div id="view-remoteauth" style="background-color:#eee; padding:20px; max-width:600px">
+
+    <div id="view-remoteauth" style="background-color:#eee; padding:20px; max-width:600px" class="tab-pane active">
         <h4>Remote Auth</h4>
         <p style="color:#666">Enter host, username and password of remote account</p>
         <label>Host (default: mqtt.emoncms.org):</label>
@@ -52,15 +26,14 @@
         <div id="success" class="alert alert-success hide" style="margin-top:20px"><b>Success:</b> Authentication verified & details saved</div>
         <div id="error" class="alert alert-error hide" style="margin-top:20px"></div>
     </div>
-    <div id="view-accesscontrol" style="background-color:#eee; padding:20px; max-width:600px" class="hide">
-    
+
+    <div id="view-accesscontrol" style="background-color:#eee; padding:20px; max-width:600px" class="tab-pane">
         <h4>Access Control</h4>
         <p style="color:#666">List of allowed API end points and access level.</p>
         <table class="table" style="margin-top:20px">
             <tr><th>Path</th><th>Access</th><th></th></tr>
             <tbody id="access_control"></tbody>
         </table>
-        
         <p style="color:#666">Add end point:</p>
         <div class="input-prepend input-append">
             <div class="add-on">Path</div>
@@ -70,25 +43,11 @@
         </div>
     </div>
 
-  </div>
 </div>
-
-<script type="text/javascript" src="<?php echo $path; ?>Lib/misc/sidebar.js?v=<?php echo $version; ?>"></script>
 
 <script>
 init_sidebar({menu_element:"#remoteaccess_menu"});
-var path = "<?php echo $path; ?>";
 var config = <?php echo json_encode($config); ?>;
-
-if (location.hash=="#remoteauth") {
-    $("#view-accesscontrol").hide();
-    $("#view-remoteauth").show();
-}
-
-if (location.hash=="#accesscontrol") {
-    $("#view-accesscontrol").show();
-    $("#view-remoteauth").hide();
-}
 
 $("#host").val(config.MQTT_HOST);
 $("#username").val(config.MQTT_USERNAME);
@@ -144,18 +103,6 @@ $("#add_endpoint").click(function() {
     save_access_control();
 });
 
-$(window).bind( 'hashchange', function(e) { 
-    if (location.hash=="#remoteauth") {
-        $("#view-accesscontrol").hide();
-        $("#view-remoteauth").show();
-    }
-    
-    if (location.hash=="#accesscontrol") {
-        $("#view-accesscontrol").show();
-        $("#view-remoteauth").hide();
-    }
-});
-
 function draw_access_control() {
     var out = "";
     for (var path in config.ACCESS_CONTROL) {
@@ -179,5 +126,40 @@ function save_access_control() {
             alert(result.message);
         }
     }});
+}
+
+
+$(function () {
+    // trigger tab open on click (adding hash to location)
+    $('#nav-tabs a').click(function (e) {
+        e.preventDefault();
+        var href = $(e.target).attr('href');
+        selectTab(href.replace('view-',''));
+        // show tab
+        $(this).tab('show');
+        // change hash
+        location.hash = href.replace('view-','');
+    })
+    // pre-select tab on load
+    // @todo: fix slight delay from ajax calls
+    selectTab();
+
+    // on hash change
+    $(window).on('hashchange', function(event) {
+        selectTab(location.hash);
+    })
+})
+/**
+ * loop through all tabs and highlight one if given [hash] is a match
+ */
+function selectTab(hash) {
+    hash = hash || location.hash;
+
+    $.each($('#backup-tabs a'), function(i,elem) {
+        var $tab = $(elem);
+        if($tab.attr('href') == hash.replace('#','#view-')) {
+            $tab.tab('show');
+        }
+    });
 }
 </script>
