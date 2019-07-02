@@ -5,9 +5,9 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 function remoteaccess_controller() {
 
-    global $session, $route, $homedir, $user;
+    global $session, $route, $linked_modules_dir, $user;
     
-    $config_file = $homedir."/remoteaccess-client/remoteaccess.json";
+    $config_file = $linked_modules_dir."/remoteaccess-client/remoteaccess.json";
     
     // Default route format
     $route->format = 'json';
@@ -61,7 +61,7 @@ function remoteaccess_controller() {
                     $config->MQTT_HOST = $host;
                     $config->MQTT_USERNAME = $username;
                     $config->MQTT_PASSWORD = $password;
-                    $fh = fopen($homedir."/remoteaccess-client/remoteaccess.json","w");
+                    $fh = fopen($linked_modules_dir."/remoteaccess-client/remoteaccess.json","w");
                     fwrite($fh,json_encode($config, JSON_PRETTY_PRINT));
                     fclose($fh);
                 }
@@ -92,7 +92,7 @@ function remoteaccess_controller() {
                 }
             }
             
-            $fh = fopen($homedir."/remoteaccess-client/remoteaccess.json","w");
+            $fh = fopen($linked_modules_dir."/remoteaccess-client/remoteaccess.json","w");
             fwrite($fh,json_encode($config, JSON_PRETTY_PRINT));
             fclose($fh);
             
