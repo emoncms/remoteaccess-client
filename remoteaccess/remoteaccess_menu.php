@@ -1,10 +1,10 @@
 <?php
-    
-    $menu['setup'][] = array(
+    $menu['sidebar']['emoncms'][] = array(
         'text' => _("RemoteAccess"),
         'title' => _("Remote Access"),
         'path' => 'remoteaccess/view',
-        'icon' => 'earth'
+        'icon' => 'earth',
+        'order' => 'b6'
     );
 
     $menu['sidebar']['remoteaccess'][] = array(
