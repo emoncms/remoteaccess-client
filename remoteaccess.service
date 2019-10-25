@@ -6,7 +6,7 @@
 
 # INSTALL:
 
-# sudo ln -s /home/pi/remoteaccess-client/remoteaccess.service /lib/systemd/system
+# sudo ln -s /opt/emoncms/modules/remoteaccess-client/remoteaccess.service /lib/systemd/system
 
 # RUN AT STARTUP
 # sudo systemctl daemon-reload
@@ -50,7 +50,7 @@ Documentation=https://github.com/emoncms/remoteaccess-client.git
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python /home/pi/remoteaccess-client/client.py
+ExecStart=/usr/bin/python /opt/emoncms/modules/remoteaccess-client/client.py
 User=pi
 
 # Restart script if stopped
