@@ -61,9 +61,23 @@ function remoteaccess_controller() {
                     $config->MQTT_HOST = $host;
                     $config->MQTT_USERNAME = $username;
                     $config->MQTT_PASSWORD = $password;
-                    $fh = fopen($linked_modules_dir."/remoteaccess-client/remoteaccess.json","w");
-                    fwrite($fh,json_encode($config, JSON_PRETTY_PRINT));
-                    fclose($fh);
+                    $filepath = $linked_modules_dir."/remoteaccess-client/remoteaccess.json";
+                    
+                    // fopen throws warnings. use this error handler to catch warnings:
+                    set_error_handler(function($errno, $errstr, $errfile, $errline, $errcontext) {
+                        // create a new error exception to allow it to be caught in the try/catch statements
+                        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+                    });
+                    try {
+                        $fh = fopen($filepath,"w");
+                        fwrite($fh, json_encode($config, JSON_PRETTY_PRINT));
+                        fclose($fh);
+
+                    } catch (ErrorException $e) {
+                        return array('success'=>false, 'message'=> $e->getMessage());
+                    }
+                    // put standard error handler back in place.
+                    restore_error_handler();
                 }
             }
             return $result;

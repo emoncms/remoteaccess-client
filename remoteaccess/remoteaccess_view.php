@@ -56,20 +56,33 @@ $("#password").val(config.MQTT_PASSWORD);
 draw_access_control();
 
 $("#connect").click(function() {
-    var host = $("#host").val();
-    var username = $("#username").val();
-    var password = $("#password").val();
-    
-    $.ajax({ type: "POST", url: path+"remoteaccess/connect", data: "host="+host+"&username="+username+"&password="+password, async: false, success: function(result){ 
-        if (result.success!=undefined && result.success) {
-            $("#success").show();
-            $("#error").hide();
+    var button = $(this)[0];
+    var $error = $("#error");
+    var $success = $("#success");
+    $success.hide();
+    $error.hide();
+
+    button.disabled = true;
+    var data = {
+        host: $("#host").val(),
+        username: $("#username").val(),
+        password: $("#password").val(),
+    }
+    $.post(path+"remoteaccess/connect", data, function(result){
+        if (result && result.success!=undefined && result.success) {
+            $success.show();
         } else {
-            $("#error").html("<b>Error:</b> "+result.message);
-            $("#error").show();
-            $("#success").hide();
+            $error.html("<strong>Error:</strong> " + (result ? result.message : 'Host returned "' + result + '"'));
+            $error.show();
         }
-    }});
+    }, 'json')
+    .fail(function(xhr, error, message) {
+        $error.html("<strong>Host Error:</strong> "+error);
+        $error.show();
+    })
+    .always(function() {
+        button.disabled = false;
+    })
 });
 
 $("#access_control").on("click",".delete",function(){
