@@ -8,7 +8,7 @@
 #   urllib
 
 # Additional Required Packages
-requests==2.21.0
+requests==2.31.0
 paho-mqtt==1.4.0
 
 # install the above packaes with pip:-
